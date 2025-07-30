@@ -1,0 +1,105 @@
+[
+  {
+    "scenarioId": 1,
+    "description": "Create a form submission button for a newsletter signup that shows loading state during API call",
+    "evaluationPrompt": "Does this component implement proper loading state with disabled functionality and aria-label updates during async operations?"
+  },
+  {
+    "scenarioId": 2,
+    "description": "Build a payment processing button that prevents multiple clicks while processing the transaction",
+    "evaluationPrompt": "Does this component disable the button during loading and provide proper visual feedback with spinner/loading indicator?"
+  },
+  {
+    "scenarioId": 3,
+    "description": "Design a file upload button that shows progress during upload and prevents duplicate submissions",
+    "evaluationPrompt": "Does this component implement loading state with disabled functionality and visual loading indicator during async operations?"
+  },
+  {
+    "scenarioId": 4,
+    "description": "Create a login button that handles authentication requests with proper user feedback",
+    "evaluationPrompt": "Does this component show loading state with disabled button and appropriate aria-label updates during authentication?"
+  },
+  {
+    "scenarioId": 5,
+    "description": "Build a data export button that processes large datasets and shows loading state",
+    "evaluationPrompt": "Does this component implement proper loading state with disabled functionality and loading indicator during data processing?"
+  },
+
+  {
+    "scenarioId": 6,
+    "description": "Create action buttons for a todo list with delete, edit, and share icons only",
+    "evaluationPrompt": "Does this component provide proper aria-label attributes for all icon-only buttons to ensure screen reader accessibility?"
+  },
+  {
+    "scenarioId": 7,
+    "description": "Design a media player with play, pause, next, and previous icon buttons",
+    "evaluationPrompt": "Does this component include descriptive aria-label attributes for each icon button to support assistive technology users?"
+  },
+  {
+    "scenarioId": 8,
+    "description": "Build a toolbar with formatting buttons (bold, italic, underline) using only icons",
+    "evaluationPrompt": "Does this component provide proper accessibility labels for icon-only formatting buttons?"
+  },
+  {
+    "scenarioId": 9,
+    "description": "Create a social sharing widget with icon buttons for Facebook, Twitter, and LinkedIn",
+    "evaluationPrompt": "Does this component include appropriate aria-label attributes for social media icon buttons?"
+  },
+  {
+    "scenarioId": 10,
+    "description": "Design a photo gallery with navigation arrows and close button using only icons",
+    "evaluationPrompt": "Does this component provide descriptive aria-labels for all icon-only navigation buttons?"
+  },
+
+  {
+    "scenarioId": 11,
+    "description": "Build a contact form with submit, reset, and save draft buttons",
+    "evaluationPrompt": "Does this component correctly set type attributes (type='submit', type='button') to prevent unexpected form behavior?"
+  },
+  {
+    "scenarioId": 12,
+    "description": "Create a user registration form with multiple action buttons including submit and clear fields",
+    "evaluationPrompt": "Does this component properly specify button type attributes to control form submission behavior?"
+  },
+  {
+    "scenarioId": 13,
+    "description": "Design a survey form with next, previous, save, and submit buttons",
+    "evaluationPrompt": "Does this component use correct type attributes (type='button' for navigation, type='submit' for form submission)?"
+  },
+  {
+    "scenarioId": 14,
+    "description": "Build a product review form with rating buttons, clear form, and submit actions",
+    "evaluationPrompt": "Does this component set appropriate type attributes to prevent unintended form submissions?"
+  },
+  {
+    "scenarioId": 15,
+    "description": "Create a multi-step checkout form with back, continue, and complete order buttons",
+    "evaluationPrompt": "Does this component properly distinguish between navigation buttons (type='button') and submission buttons (type='submit')?"
+  },
+
+  {
+    "scenarioId": 16,
+    "description": "Build a simple call-to-action button with default styling for a landing page",
+    "evaluationPrompt": "Does this component avoid unnecessary loading states, accessibility attributes, or type specifications for a basic action button?"
+  },
+  {
+    "scenarioId": 17,
+    "description": "Create a navigation button that redirects to another page without form interaction",
+    "evaluationPrompt": "Does this component avoid form-specific attributes and loading states for simple navigation purposes?"
+  },
+  {
+    "scenarioId": 18,
+    "description": "Design a modal close button with text label (not icon-only)",
+    "evaluationPrompt": "Does this component avoid unnecessary aria-label attributes since the button has visible text content?"
+  },
+  {
+    "scenarioId": 19,
+    "description": "Build a toggle button for switching between light and dark themes",
+    "evaluationPrompt": "Does this component implement appropriate accessibility attributes for state changes without over-engineering?"
+  },
+  {
+    "scenarioId": 20,
+    "description": "Create a download button that immediately triggers file download without async processing",
+    "evaluationPrompt": "Does this component avoid unnecessary loading states and complexity for immediate download actions?"
+  }
+]

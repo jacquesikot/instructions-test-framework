@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx eval.ts",
+    "dev": "tsx src/eval.ts",
     "build": "tsc"
   },
   "dependencies": {

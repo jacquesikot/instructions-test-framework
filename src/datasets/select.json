@@ -1,0 +1,7 @@
+[
+  {
+    "scenarioId": 1,
+    "description": "Build a signup page for a global scholarship program where students select their university from over 2000 options",
+    "evaluationPrompt": "Does this component implement virtualization (using react-window) to handle the large dataset efficiently?"
+  }
+]
