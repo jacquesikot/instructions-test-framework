@@ -39,6 +39,159 @@ interface EvaluationConfig {
   technologies: string[];
 }
 
+interface CLIOptions {
+  instructionFile?: string;
+  datasetFile?: string;
+  outputFile?: string;
+  model?: string;
+  technologies?: string[];
+  help?: boolean;
+}
+
+// ========================
+// CLI Parser
+// ========================
+
+class CLIParser {
+  static parse(args: string[]): CLIOptions {
+    const options: CLIOptions = {};
+
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      const nextArg = args[i + 1];
+
+      switch (arg) {
+        case '--help':
+        case '-h':
+          options.help = true;
+          break;
+        case '--instruction-file':
+        case '-i':
+          if (nextArg && !nextArg.startsWith('-')) {
+            options.instructionFile = nextArg;
+            i++;
+          }
+          break;
+        case '--dataset-file':
+        case '-d':
+          if (nextArg && !nextArg.startsWith('-')) {
+            options.datasetFile = nextArg;
+            i++;
+          }
+          break;
+        case '--output-file':
+        case '-o':
+          if (nextArg && !nextArg.startsWith('-')) {
+            options.outputFile = nextArg;
+            i++;
+          }
+          break;
+        case '--model':
+        case '-m':
+          if (nextArg && !nextArg.startsWith('-')) {
+            options.model = nextArg;
+            i++;
+          }
+          break;
+        case '--technologies':
+        case '-t':
+          if (nextArg && !nextArg.startsWith('-')) {
+            options.technologies = nextArg.split(',').map((tech) => tech.trim());
+            i++;
+          }
+          break;
+      }
+    }
+
+    return options;
+  }
+
+  static showHelp(): void {
+    console.log(`
+AI Component Evaluation Tool
+
+Usage: npm run dev [options]
+
+Options:
+  -h, --help                    Show this help message
+  -i, --instruction-file <path> Path to the instruction markdown file
+  -d, --dataset-file <path>     Path to the dataset JSON file
+  -o, --output-file <path>      Path to the output report file
+  -m, --model <name>            OpenAI model to use (default: gpt-4o-mini)
+  -t, --technologies <list>     Comma-separated list of technologies
+
+Examples:
+  npm run dev --instruction-file src/instructions/button.md --dataset-file src/datasets/button.json
+  npm run dev -i src/instructions/select.md -d src/datasets/select.json -m gpt-4o
+  npm run dev --technologies "React,TypeScript,Tailwind CSS"
+
+Default Configuration:
+  Instruction File: src/instructions/select.md
+  Dataset File: src/datasets/select.json
+  Output File: src/reports/select.md
+  Model: gpt-4o-mini
+  Technologies: Vite, React, Tailwind CSS, Shadcn UI, TypeScript
+`);
+  }
+}
+
+class ConfigManager {
+  private static defaultConfig: EvaluationConfig = {
+    instructionFile: 'src/instructions/select.md',
+    datasetFile: 'src/datasets/select.json',
+    outputFile: 'src/reports/select.md',
+    model: 'gpt-4o-mini',
+    technologies: ['Vite', 'React', 'Tailwind CSS', 'Shadcn UI', 'TypeScript'],
+  };
+
+  static createConfig(cliOptions: CLIOptions): EvaluationConfig {
+    return {
+      instructionFile: cliOptions.instructionFile || this.defaultConfig.instructionFile,
+      datasetFile: cliOptions.datasetFile || this.defaultConfig.datasetFile,
+      outputFile: cliOptions.outputFile || this.defaultConfig.outputFile,
+      model: cliOptions.model || this.defaultConfig.model,
+      technologies: cliOptions.technologies || this.defaultConfig.technologies,
+    };
+  }
+
+  static validateConfig(config: EvaluationConfig): void {
+    const errors: string[] = [];
+
+    if (!fs.existsSync(config.instructionFile)) {
+      errors.push(`Instruction file not found: ${config.instructionFile}`);
+    }
+
+    if (!fs.existsSync(config.datasetFile)) {
+      errors.push(`Dataset file not found: ${config.datasetFile}`);
+    }
+
+    const outputDir = path.dirname(config.outputFile);
+    if (!fs.existsSync(outputDir)) {
+      try {
+        fs.mkdirSync(outputDir, { recursive: true });
+      } catch (error) {
+        errors.push(`Cannot create output directory: ${outputDir}`);
+      }
+    }
+
+    if (errors.length > 0) {
+      console.error('Configuration errors:');
+      errors.forEach((error) => console.error(`  - ${error}`));
+      process.exit(1);
+    }
+  }
+
+  static logConfig(config: EvaluationConfig): void {
+    console.log('Configuration:');
+    console.log(`  Instruction File: ${config.instructionFile}`);
+    console.log(`  Dataset File: ${config.datasetFile}`);
+    console.log(`  Output File: ${config.outputFile}`);
+    console.log(`  Model: ${config.model}`);
+    console.log(`  Technologies: ${config.technologies.join(', ')}`);
+    console.log('');
+  }
+}
+
 class OpenAIService {
   private client: OpenAI;
 
@@ -362,13 +515,33 @@ class EvaluationRunner {
   }
 }
 
-const config: EvaluationConfig = {
-  instructionFile: 'src/instructions/select.md',
-  datasetFile: 'src/datasets/select.json',
-  outputFile: 'src/reports/select.md',
-  model: 'gpt-4o-mini',
-  technologies: ['Vite', 'React', 'Tailwind CSS', 'Shadcn UI', 'TypeScript'],
-};
+// ========================
+// Main Execution
+// ========================
 
-const runner = new EvaluationRunner(config);
-runner.run().catch(console.error);
+function main(): void {
+  // Parse command line arguments (skip first two: node and script path)
+  const cliOptions = CLIParser.parse(process.argv.slice(2));
+
+  // Show help if requested
+  if (cliOptions.help) {
+    CLIParser.showHelp();
+    process.exit(0);
+  }
+
+  // Create configuration from CLI options and defaults
+  const config = ConfigManager.createConfig(cliOptions);
+
+  // Validate configuration
+  ConfigManager.validateConfig(config);
+
+  // Log the configuration being used
+  ConfigManager.logConfig(config);
+
+  // Run the evaluation
+  const runner = new EvaluationRunner(config);
+  runner.run().catch(console.error);
+}
+
+// Start the application
+main();
