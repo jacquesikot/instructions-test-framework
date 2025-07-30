@@ -101,3 +101,96 @@ REASONING: The component indeed implements virtualization using the `react-windo
 
 ---
 
+# AI Evaluation Report - Select Component
+
+**Generated:** July 30, 2025 at 07:30:10 AM GMT+1
+**Component:** select
+**Total Scenarios:** 1
+**Passed:** 1
+**Failed:** 0
+**Success Rate:** 100.0%
+**Average Score:** 100.0%
+
+---
+
+## Scenario 1 ✅ PASSED
+
+          **Score:** 100.0%
+
+          ### Input Description
+          Build a signup page for a global scholarship program where students select their university from over 2000 options
+
+          ### Evaluation Question
+          Does this component implement virtualization (using react-window) to handle the large dataset efficiently?
+
+          ### AI Evaluation Result
+          **Answer:** YES
+
+          ### AI Reasoning
+          The component implements virtualization correctly by utilizing the `react-window` library to manage a large dataset of items efficiently. When the number of items exceeds 200, it renders a `SelectContent` component that contains a `FixedSizeList`. This list only renders a portion of the items that are currently visible in the viewport, thus reducing the number of DOM elements created and improving performance. The `itemCount` and `itemSize` properties of the `FixedSizeList` indicate how many items to render and their size, respectively, ensuring that only the necessary items are displayed at a time. The use of style passed to the `div` for each item allows proper layout according to the list's virtualization logic. Therefore, the component is designed to handle larger datasets efficiently through virtualization.
+
+          ### Generated Component Code
+          ```typescript
+          ```tsx
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FixedSizeList as List } from 'react-window';
+
+const universities = [...Array(2000)].map((_, index) => ({
+  id: index,
+  value: `university-${index}`,
+  label: `University ${index + 1}`,
+}));
+
+const VirtualizedSelect = ({ items, ...props }) => {
+  if (items.length > 200) {
+    return (
+      <Select {...props}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select your university" />
+        </SelectTrigger>
+        <SelectContent>
+          <List height={200} itemCount={items.length} itemSize={35} itemData={items}>
+            {({ index, style, data }) => (
+              <div style={style}>
+                <SelectItem value={data[index].value}>{data[index].label}</SelectItem>
+              </div>
+            )}
+          </List>
+        </SelectContent>
+      </Select>
+    );
+  }
+
+  return (
+    <Select {...props}>
+      <SelectTrigger>
+        <SelectValue placeholder="Select your university" />
+      </SelectTrigger>
+      <SelectContent>
+        {items.map((item) => (
+          <SelectItem key={item.id} value={item.value}>
+            {item.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
+
+// Usage
+<VirtualizedSelect items={universities} />;
+```
+          ```
+
+          ### Full AI Evaluation Response
+          ```
+          ANSWER: YES  
+REASONING: The component implements virtualization correctly by utilizing the `react-window` library to manage a large dataset of items efficiently. When the number of items exceeds 200, it renders a `SelectContent` component that contains a `FixedSizeList`. This list only renders a portion of the items that are currently visible in the viewport, thus reducing the number of DOM elements created and improving performance. The `itemCount` and `itemSize` properties of the `FixedSizeList` indicate how many items to render and their size, respectively, ensuring that only the necessary items are displayed at a time. The use of style passed to the `div` for each item allows proper layout according to the list's virtualization logic. Therefore, the component is designed to handle larger datasets efficiently through virtualization.
+          ```
+
+          ---
+
+          
+
+================================================================================
+

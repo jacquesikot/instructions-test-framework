@@ -178,14 +178,32 @@ class EvaluationEngine {
 }
 
 class ReportGenerator {
-  static generate(scenarios: EvaluationScenario[], outputPath: string): void {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  static generate(scenarios: EvaluationScenario[], outputDir: string, componentName: string): string {
+    const now = new Date();
+    const readableTimestamp = now.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZoneName: 'short',
+    });
+
+    // Create filename-safe timestamp
+    const fileTimestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5); // Remove milliseconds and Z
+    const filename = `${componentName}-${fileTimestamp}.md`;
+    const outputPath = path.join(outputDir, filename);
+
     const stats = this.calculateStatistics(scenarios);
 
-    let report = this.generateHeader(stats);
+    let report = this.generateHeader(stats, componentName, readableTimestamp);
     report += this.generateScenarioDetails(scenarios);
 
+    // Write to unique file (no need to append since each file is unique)
     FileService.writeFile(outputPath, report);
+
+    return outputPath;
   }
 
   private static calculateStatistics(scenarios: EvaluationScenario[]) {
@@ -202,19 +220,24 @@ class ReportGenerator {
     };
   }
 
-  private static generateHeader(stats: ReturnType<typeof ReportGenerator.calculateStatistics>): string {
-    return `# AI Evaluation Report
+  private static generateHeader(
+    stats: ReturnType<typeof ReportGenerator.calculateStatistics>,
+    componentName: string,
+    timestamp: string
+  ): string {
+    return `# AI Evaluation Report - ${componentName.charAt(0).toUpperCase() + componentName.slice(1)} Component
 
-            **Generated:** ${new Date().toLocaleString()}
-            **Total Scenarios:** ${stats.totalCount}
-            **Passed:** ${stats.passedCount}
-            **Failed:** ${stats.failedCount}
-            **Success Rate:** ${stats.successRate.toFixed(1)}%
-            **Average Score:** ${stats.averageScore.toFixed(1)}%
+**Generated:** ${timestamp}
+**Component:** ${componentName}
+**Total Scenarios:** ${stats.totalCount}
+**Passed:** ${stats.passedCount}
+**Failed:** ${stats.failedCount}
+**Success Rate:** ${stats.successRate.toFixed(1)}%
+**Average Score:** ${stats.averageScore.toFixed(1)}%
 
-            ---
+---
 
-            `;
+`;
   }
 
   private static generateScenarioDetails(scenarios: EvaluationScenario[]): string {
@@ -226,33 +249,33 @@ class ReportGenerator {
 
         return `## Scenario ${scenarioId} ${status}
 
-          **Score:** ${scorePercent}%
+**Score:** ${scorePercent}%
 
-          ### Input Description
-          ${description}
+### Input Description
+${description}
 
-          ### Evaluation Question
-          ${evaluationPrompt}
+### Evaluation Question
+${evaluationPrompt}
 
-          ### AI Evaluation Result
-          **Answer:** ${evalResult.passed ? 'YES' : 'NO'}
+### AI Evaluation Result
+**Answer:** ${evalResult.passed ? 'YES' : 'NO'}
 
-          ### AI Reasoning
-          ${evalResult.reasoning}
+### AI Reasoning
+${evalResult.reasoning}
 
-          ### Generated Component Code
-          \`\`\`typescript
-          ${evalResult.output}
-          \`\`\`
+### Generated Component Code
+\`\`\`typescript
+${evalResult.output}
+\`\`\`
 
-          ### Full AI Evaluation Response
-          \`\`\`
-          ${evalResult.aiEvaluation}
-          \`\`\`
+### Full AI Evaluation Response
+\`\`\`
+${evalResult.aiEvaluation}
+\`\`\`
 
-          ---
+---
 
-          `;
+`;
       })
       .join('');
   }
@@ -270,7 +293,7 @@ class ConsoleLogger {
     console.log(`AI Reasoning: ${evalResult.reasoning.slice(0, 100)}...\n`);
   }
 
-  static logSummary(scenarios: EvaluationScenario[]): void {
+  static logSummary(scenarios: EvaluationScenario[], reportPath: string): void {
     const passedCount = scenarios.filter((s) => s.evalResult.passed).length;
     const totalCount = scenarios.length;
     const averageScore = scenarios.reduce((sum, s) => sum + s.evalResult.score, 0) / totalCount;
@@ -283,7 +306,7 @@ class ConsoleLogger {
     console.log(`Failed: ${totalCount - passedCount}`);
     console.log(`Success rate: ${((passedCount / totalCount) * 100).toFixed(1)}%`);
     console.log(`Average score: ${(averageScore * 100).toFixed(1)}%`);
-    console.log('\nDetailed report saved to: src/reports/report.md');
+    console.log(`\nDetailed report saved to: ${reportPath}`);
 
     this.logFailedScenarios(scenarios);
   }
@@ -332,15 +355,17 @@ class EvaluationRunner {
       });
     }
 
-    ReportGenerator.generate(scenarios, this.config.outputFile);
-    ConsoleLogger.logSummary(scenarios);
+    const componentName = path.basename(this.config.instructionFile, '.md');
+    const outputDir = path.dirname(this.config.outputFile);
+    const reportPath = ReportGenerator.generate(scenarios, outputDir, componentName);
+    ConsoleLogger.logSummary(scenarios, reportPath);
   }
 }
 
 const config: EvaluationConfig = {
   instructionFile: 'src/instructions/select.md',
   datasetFile: 'src/datasets/select.json',
-  outputFile: 'src/reports/report.md',
+  outputFile: 'src/reports/select.md',
   model: 'gpt-4o-mini',
   technologies: ['Vite', 'React', 'Tailwind CSS', 'Shadcn UI', 'TypeScript'],
 };
